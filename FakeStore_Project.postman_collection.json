@@ -1,0 +1,1001 @@
+{
+	"info": {
+		"_postman_id": "6e3871ac-369a-45b1-bfab-3c4a490cf3e8",
+		"name": "FakeStore_Project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29785971"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "GetToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Token Received\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include('token');\r",
+									"});\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{Valid_Username}}\",\r\n    \"password\": \"{{Valid_Password}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/auth/login",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetToken_InValidUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"No Token Recieved\", function () {\r",
+									"    pm.expect(pm.response.text()).not.to.include('token');\r",
+									"});\r",
+									"pm.test(\"Unauthorized\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{$randomusernameName}}\",\r\n    \"password\": \"{{$randomPassword}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/auth/login",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get_all",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Carts Returned\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\",\"userId\",\"date\",\"products\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/carts",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get_Single_Cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Cart Displayed Successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.id).to.eql(5);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/carts/5",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"carts",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetCart_inDateRange",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"var startdate = pm.environment.get(\"startdate\");\r",
+									"var enddate = pm.environment.get(\"enddate\");\r",
+									"\r",
+									"pm.test(\"Dates within range\", () => {\r",
+									"    var response = pm.response.json();\r",
+									"    var date = new Date(response[0].date);\r",
+									"    var from = new Date(startdate);\r",
+									"    var to = new Date(enddate);\r",
+									"    \r",
+									"    if (from <= date && date <= to) {\r",
+									"        console.log('Date is in Range');\r",
+									"    } else {\r",
+									"        console.log('Date is not in Range');\r",
+									"        pm.expect.fail('Dates not in Range');\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"startdate\",\"2019-12-10\");\r",
+									"pm.environment.set(\"enddate\",\"2020-01-02\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseurl}}/carts/?startdate={{startdate}}&enddate={{enddate}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"carts",
+								""
+							],
+							"query": [
+								{
+									"key": "startdate",
+									"value": "{{startdate}}"
+								},
+								{
+									"key": "enddate",
+									"value": "{{enddate}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AddCart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Body matches string\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\",\"userId\",\"date\",\"products\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"userId\": 3,\r\n    \"date\": \"2020-03-01T00:00:00.000Z\",\r\n    \"products\": \r\n        {\r\n            \"productId\": 7,\r\n            \"quantity\": 1\r\n        }\r\n }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/carts",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Editcart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"productQuantity updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.products.productId).to.eql(pm.environment.get(\"random_number1\"));\r",
+									"});\r",
+									"pm.test(\"productID updated\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.products.quantity).to.eql(pm.environment.get(\"random_number2\"));\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"userId\": 3,\r\n    \"date\": \"2020-03-01T00:00:00.000Z\",\r\n    \"products\": \r\n        {\r\n            \"productId\": {{random_number1}},\r\n            \"quantity\": {{random_number2}}\r\n        }\r\n }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/carts/11",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"carts",
+								"11"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"cart deleted\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.eql(null);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/carts/11",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"carts",
+								"11"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get_products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"products are displayed\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\",\"title\",\"price\",\"description\");\r",
+									"});\r",
+									"pm.test(\"products id displayed successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].id).to.eql(1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/products",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get_product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"    pm.test(\"product displayed\", function () {\r",
+									"        var jsonData = pm.response.json();\r",
+									"\r",
+									"        var productno=pm.environment.get(\"random_number1\");\r",
+									"        pm.expect(jsonData.id).to.eql(productno);\r",
+									"    });\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/products/{{random_number1}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"products",
+								"{{random_number1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sort_products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Body matches string', function () {\r",
+									"    pm.expect(pm.response.text()).to.include('id', 'title', 'price', 'description');\r",
+									"})\r",
+									"\r",
+									"pm.test(\"All ids are descending\", () => {\r",
+									"    const response = pm.response.json();\r",
+									"\r",
+									"    const isDescending = response.map(item => item.id).every((current, index, ids) => index === 0 || current <= ids[index-1]);\r",
+									"    \r",
+									"    pm.expect(isDescending).to.be.true;\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/products?sort=desc",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Addproduct",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Product Added\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\",\"title\",\"price\",\"description\");\r",
+									"});\r",
+									"var response=pm.response.json()\r",
+									"pm.environment.set(\"product_id\", response.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"title\":\"hi\",\r\n    \"price\":\"12\",\r\n    \"description\":\"new\",\r\n     \"category\": \"electronic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/products",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Product Updated\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\",\"title\",\"price\",\"description\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"title\":\"test product\",\r\n    \"price\":\"12\",\r\n    \"description\":\"new\",\r\n     \"category\": \"electronic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/products/{{product_id}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Product Deleted\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(null);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n    \"title\":\"test product\",\r\n    \"price\":\"12\",\r\n    \"description\":\"new\",\r\n     \"category\": \"electronic\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/products/{{product_id}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get_User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"User Data Displayed successfully\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var usernumber=pm.environment.get(\"User_random_number\");\r",
+									"    pm.expect(jsonData.id).to.eql(usernumber);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/users/{{User_random_number}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users",
+								"{{User_random_number}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Phone Number Updated\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"01141533854\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"address\": {\r\n            \"geolocation\": {\r\n                \"lat\": \"-37.3159\",\r\n                \"long\": \"81.1496\"\r\n            },\r\n            \"city\": \"kilcoole\",\r\n            \"street\": \"new road\",\r\n            \"number\": 7682,\r\n            \"zipcode\": \"12926-3874\"\r\n        },\r\n        \r\n        \"email\": \"abdo@gmail.com\",\r\n        \"username\": \"abdo\",\r\n        \"password\": \"ssssssss$\",\r\n        \"name\": {\r\n            \"firstname\": \"abdo\",\r\n            \"lastname\": \"ahmed\"\r\n        },\r\n        \"phone\": \"01141533854\",\r\n        \"__v\": 0\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/users/{{User_random_number}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users",
+								"{{User_random_number}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add_User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"User Added Successfully\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"id\");\r",
+									"});\r",
+									"var body=pm.response.json();\r",
+									"pm.environment.set(\"NewUser\", body.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n        \"address\": {\r\n            \"geolocation\": {\r\n                \"lat\": \"-37.3159\",\r\n                \"long\": \"81.1496\"\r\n            },\r\n            \"city\": \"kilcoole\",\r\n            \"street\": \"new road\",\r\n            \"number\": 7682,\r\n            \"zipcode\": \"12926-3874\"\r\n        },\r\n        \r\n        \"email\": \"abdo@gmail.com\",\r\n        \"username\": \"abdo\",\r\n        \"password\": \"sssss$\",\r\n        \"name\": {\r\n            \"firstname\": \"abdo\",\r\n            \"lastname\": \"ahmed\"\r\n        },\r\n        \"phone\": \"1-570-236-7033\",\r\n        \"__v\": 0\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/users",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"User deleted\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(null);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseurl}}/users/{{NewUser}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users",
+								"{{NewUser}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get_Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Users data displayed\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"email\",\"id\",\"username\");\r",
+									"});\r",
+									"var body=pm.response.json();\r",
+									"var usernumber=(pm.environment.get(\"User_random_number\"));\r",
+									"pm.environment.set(\"Valid_Username\", body[usernumber-1].username);\r",
+									"pm.environment.set(\"Valid_Password\", body[usernumber-1].password);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/users",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Limit_Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"\r",
+									"var data = pm.response.json();\r",
+									"var limit=pm.environment.get(\"User_random_number\");\r",
+									"pm.test('number of users as limited', function () {\r",
+									"    pm.expect(data.length).to.equal(limit)\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/users?limit={{User_random_number}}",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "{{User_random_number}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.environment.set(",
+					"    \"random_number1\",",
+					"    _.random(1, 20)",
+					")",
+					"pm.environment.set(",
+					"    \"random_number2\",",
+					"    _.random(1, 100)",
+					")",
+					"pm.environment.set(",
+					"    \"User_random_number\",",
+					"    _.random(1, 10)",
+					")",
+					"pm.environment.set('RandomUsername',\"RND\"+String((new Date()).getTime()).replace(/\\compD/gi,'').substring(7));",
+					"pm.environment.set('RandomPassword',\"RND\"+String((new Date()).getTime()).replace(/\\compD/gi,'').substring(10));",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"",
+					"pm.test(\"Response time is less than 3s\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(3000);",
+					"});"
+				]
+			}
+		}
+	]
+}
